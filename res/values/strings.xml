@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Les Strings de base -->
     <string name="app_name">Point-it_Android</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     
+    <!-- Les Strings des titres des activités -->
     <string name="title_activity_accueil"> Point-it </string>
+    <string name="title_activity_connexion">Connexion</string>
     
+    <!-- Strings de l'activité Accueil -->
+    <string name="messageAccueil"> Bienvenue sur l\'application Point-it </string>
+    <string name="seConnecter"> Se connecter </string>
     
-     <string name="messageAccueil"> Bienvenue sur l\'application Point-it </string>
+     <!-- Strings de l'activité Connexion -->
+     <string name="nomUtilisateur"> Nom d\'utilisateur : </string>
+     <string name="motdepasse"> Mot de passe : </string>
+     <string name="buttonConnexion"> Connexion ! </string>
 
 </resources>

@@ -2,11 +2,13 @@ package com.example.point_it_android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 public class Accueil extends Activity {
@@ -44,6 +46,16 @@ public class Accueil extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
+	 * Lance l'activité connexion
+	 * @param v
+	 */
+	public void Connexion(View v)
+	{
+		Intent intent = new Intent(this,Connexion.class); //Défini l'intent
+		startActivity(intent); //Lance l'intent
 	}
 	
 	/**
