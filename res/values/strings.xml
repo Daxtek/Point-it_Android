@@ -13,10 +13,14 @@
     <!-- Strings de l'activité Accueil -->
     <string name="messageAccueil"> Bienvenue sur l\'application Point-it </string>
     <string name="seConnecter"> Se connecter </string>
+    <string name="notConnected"> Vous n\'êtes pas connecté </string>
+    
     
      <!-- Strings de l'activité Connexion -->
      <string name="nomUtilisateur"> Nom d\'utilisateur : </string>
      <string name="motdepasse"> Mot de passe : </string>
      <string name="buttonConnexion"> Connexion ! </string>
+     <string name="connexionFailed"> Le login ou le mot de passe est faux </string>
+     <string name="connexionSuccess"> Vous êtes conneté ! </string>
 
 </resources>

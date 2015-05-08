@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,13 +20,15 @@ public class Accueil extends Activity {
 		setContentView(R.layout.activity_accueil);
 		
 		TextView test = (TextView)findViewById(R.id.test);
-		if(isOnline())
+	
+		Log.v("Accueil", "Connexion.connecte" + Connexion.connecte);
+		if(Connexion.connecte )
 		{
-			test.setText("Votre appareil est conneté");
+			test.setText(getResources().getString(R.string.connexionSuccess));
 		}
 		else
 		{
-			test.setText("Votre appareil n'est pas conneté");
+			test.setText(getResources().getString(R.string.notConnected));
 		}
 	}
 

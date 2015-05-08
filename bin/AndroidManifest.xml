@@ -31,9 +31,10 @@
         </activity>
         <activity
             android:name=".Connexion"
-            android:label="@string/title_activity_connexion"
-            android:parentActivityName=".Accueil" >
-           
+            android:label="@string/title_activity_connexion" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.point_it_android.Accueil" />
         </activity>
     </application>
 

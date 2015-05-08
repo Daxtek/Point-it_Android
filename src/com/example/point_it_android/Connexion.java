@@ -1,7 +1,9 @@
 package com.example.point_it_android;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,7 +13,8 @@ import android.widget.Toast;
 public class Connexion extends Activity {
 
 	//Déclarations des variables
-	EditText nomUtilisateur , Mdp;
+	private EditText nomUtilisateur , Mdp;
+	public static boolean connecte;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,10 +30,15 @@ public class Connexion extends Activity {
 	      if(nomUtilisateur.getText().toString().equals("admin") && Mdp.getText().toString().equals("admin"))
 	      {
 	    	  //Lancé la connexion
+	    	  connecte = true;
+	    	  Toast.makeText(getApplicationContext(), getResources().getString(R.string.connexionSuccess), Toast.LENGTH_SHORT).show();
+	    	  //Log.v("Accueil", "connecte" + connecte);
+	    	  Accueil();
+	    	  
 	      }	
 	      else
 	      {
-	    	  Toast.makeText(getApplicationContext(), "Le login ou le mot de passe est faux", Toast.LENGTH_SHORT).show();
+	    	  Toast.makeText(getApplicationContext(),  getResources().getString(R.string.connexionFailed), Toast.LENGTH_SHORT).show();
 
 	    	  //Si on veut mettre un nombre d'essaie maximum
 	    	  /*
@@ -42,6 +50,15 @@ public class Connexion extends Activity {
 	      }
 	   }
 
+	/**
+	 * Lance l'activité accueil
+	 * @param v
+	 */
+	public void Accueil()
+	{
+		Intent intent = new Intent(this,Accueil.class); //Défini l'intent
+		startActivity(intent); //Lance l'intent
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
