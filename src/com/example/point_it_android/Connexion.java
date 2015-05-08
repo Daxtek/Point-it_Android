@@ -32,7 +32,6 @@ public class Connexion extends Activity {
 	    	  //Lancé la connexion
 	    	  connecte = true;
 	    	  Toast.makeText(getApplicationContext(), getResources().getString(R.string.connexionSuccess), Toast.LENGTH_SHORT).show();
-	    	  //Log.v("Accueil", "connecte" + connecte);
 	    	  Accueil();
 	    	  
 	      }	

@@ -27,6 +27,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:onClick="Connexion"
-        android:text="@string/seConnecter" />
+        android:text="@string/boutonSeConnecter" />
+      
+       <Button
+        android:id="@+id/boutonVersInscription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:onClick="Inscription"
+        android:text="@string/boutonInscription" />
 
 </LinearLayout>

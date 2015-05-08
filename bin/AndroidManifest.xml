@@ -4,12 +4,13 @@
     android:configChanges="locale|orientation"
     android:versionCode="1"
     android:versionName="1.0" >
- <!-- configChanges pour les changement de langues -->
+
+    <!-- configChanges pour les changement de langues -->
 
     <uses-permission android:name="android.permission.INTERNET" />
- <!-- Nous autorise à nous connecter -->
+    <!-- Nous autorise à nous connecter -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
- <!-- Pour accéder à l'état du réseau, voir si on est connecté ou non -->
+    <!-- Pour accéder à l'état du réseau, voir si on est connecté ou non -->
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -32,6 +33,14 @@
         <activity
             android:name=".Connexion"
             android:label="@string/title_activity_connexion" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.point_it_android.Accueil" />
+        </activity>
+        <activity
+            android:name=".Inscription"
+            android:label="@string/title_activity_inscription"
+            android:parentActivityName=".Accueil" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.point_it_android.Accueil" />

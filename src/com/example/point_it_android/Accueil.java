@@ -62,6 +62,16 @@ public class Accueil extends Activity {
 	}
 	
 	/**
+	 * Lance l'activité inscription
+	 * @param v
+	 */
+	public void Inscription(View v)
+	{
+		Intent intent = new Intent(this,Inscription.class); //Défini l'intent
+		startActivity(intent); //Lance l'intent
+	}
+	
+	/**
 	 * Test si le device est connecté à internet
 	 * @return boolean
 	 */
