@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.point_it_android"
+    android:configChanges="locale|orientation"
+    android:versionCode="1"
+    android:versionName="1.0" > <!-- configChanges pour les changement de langues -->
+
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Nous autorise à nous connecter -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Pour accéder à l'état du réseau, voir si on est connecté ou non -->
+    
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="21" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".Accueil"
+            android:label="@string/title_activity_accueil" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
