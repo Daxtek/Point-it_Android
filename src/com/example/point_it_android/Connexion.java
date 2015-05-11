@@ -3,7 +3,6 @@ package com.example.point_it_android;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,7 +11,7 @@ import android.widget.Toast;
 
 public class Connexion extends Activity {
 
-	//Déclarations des variables
+	//Déclaration des variables
 	private EditText nomUtilisateur , Mdp;
 	public static boolean connecte;
 	

@@ -1,5 +1,7 @@
 package com.example.point_it_android;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,25 +12,56 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-public class Accueil extends Activity {
-
+public class Accueil extends Activity 
+{
+	//Déclaration des variables
+	Button boutonVersProfil , boutonVersClassement , boutonVersInscription , boutonVersConnexion;
+	ArrayList<Button> BoutonsListe; //Liste des boutons
+	TextView connecte;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_accueil);
 		
-		TextView test = (TextView)findViewById(R.id.test);
+		//Initialisation des variables
+		connecte = (TextView)findViewById(R.id.connecte);
+		//BoutonsListe = new ArrayList<Button>();
+		boutonVersProfil= (Button)findViewById(R.id.boutonVersProfil);
+		boutonVersClassement = (Button)findViewById(R.id.boutonVersClassement);
+		boutonVersInscription  = (Button)findViewById(R.id.boutonVersInscription);
+		boutonVersConnexion  = (Button)findViewById(R.id.boutonVersConnexion);
+		
+		/*BoutonsListe.add(boutonVersProfil );
+		BoutonsListe.add(boutonVersClassement );
+		BoutonsListe.add(boutonVersInscription );
+		BoutonsListe.add(boutonVersConnexion );*/
 	
 		Log.v("Accueil", "Connexion.connecte" + Connexion.connecte);
-		if(Connexion.connecte )
+		if(Connexion.connecte ) //Si on est connecté au site Point-it
 		{
-			test.setText(getResources().getString(R.string.connexionSuccess));
+			connecte.setText(getResources().getString(R.string.connexionSuccess));
+			//Affiche les boutons
+			boutonVersProfil.setVisibility(View.VISIBLE);
+			boutonVersClassement.setVisibility(View.VISIBLE);
+			
+			boutonVersConnexion.setVisibility(View.GONE); //Cache le bouton de connexion
+			boutonVersInscription.setVisibility(View.GONE); //Cache le bouton d'inscription
+			
+		
 		}
-		else
+		else //Si on est pas connecté
 		{
-			test.setText(getResources().getString(R.string.notConnected));
+			connecte.setText(getResources().getString(R.string.notConnected));
+			//Cache les boutons autres que celui de connection 
+			boutonVersProfil.setVisibility(View.GONE);
+			boutonVersClassement.setVisibility(View.GONE);
+			
+
+			
 		}
 	}
 
@@ -49,6 +82,26 @@ public class Accueil extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	/**
+	 * Lance l'activité Profil
+	 * @param v
+	 */
+	public void Profil(View v)
+	{
+		Intent intent = new Intent(this,Profil.class); //Défini l'intent
+		startActivity(intent); //Lance l'intent
+	}
+	
+	/**
+	 * Lance l'activité Classement
+	 * @param v
+	 */
+	public void Classement(View v)
+	{
+		//Intent intent = new Intent(this,Classement.class); //Défini l'intent
+		//startActivity(intent); //Lance l'intent
 	}
 	
 	/**

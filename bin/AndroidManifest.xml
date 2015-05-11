@@ -45,6 +45,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.point_it_android.Accueil" />
         </activity>
+        <activity
+            android:name=".Profil"
+            android:label="@string/title_activity_profil" >
+        </activity>
     </application>
 
 </manifest>

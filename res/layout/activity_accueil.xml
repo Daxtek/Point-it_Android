@@ -10,16 +10,19 @@
     tools:context="com.example.point_it_android.Accueil" >
 
     <TextView
-        android:id="@+id/test"
+        android:id="@+id/connecte"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_gravity="center"
+        android:textSize="20sp"
+         />
     
      <TextView
         android:id="@+id/messageAccueil"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/messageAccueil" />
+        android:text="@string/messageAccueil"
+         />
      
       <Button
         android:id="@+id/boutonVersConnexion"
@@ -36,5 +39,23 @@
         android:layout_gravity="center"
         android:onClick="Inscription"
         android:text="@string/boutonInscription" />
+       
+        <Button
+        android:id="@+id/boutonVersProfil"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:onClick="Profil"
+        android:text="@string/boutonProfil"
+        android:visibility="gone" />
+        
+         <Button
+        android:id="@+id/boutonVersClassement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:onClick="Classement"
+        android:text="@string/boutonClassement"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -10,12 +10,15 @@
     <string name="title_activity_accueil"> Point-it </string>
     <string name="title_activity_connexion">Connexion</string>
     <string name="title_activity_inscription">Inscription</string>
+      <string name="title_activity_profil">Profil</string>
 
     <!-- Strings de l'activité Accueil -->
     <string name="messageAccueil"> Bienvenue sur l\'application Point-it </string>
     <string name="boutonSeConnecter"> Se connecter </string>
     <string name="notConnected"> Vous n\'êtes pas connecté </string>
     <string name="boutonInscription"> S\'inscrire </string>
+    <string name="boutonProfil">Profil </string>
+    <string name="boutonClassement">Classement </string>
 
     <!-- Strings de l'activité Connexion -->
     <string name="nomUtilisateur"> Nom d\'utilisateur : </string>
@@ -23,10 +26,16 @@
     <string name="buttonConnexion"> Connexion ! </string>
     <string name="connexionFailed"> Le login ou le mot de passe est faux </string>
     <string name="connexionSuccess"> Vous êtes conneté ! </string>
- 
-     <!-- Strings de l'activité Inscription --> 
-     <string name="confirmerMotdepasse"> Confirmer mot de passe </string>
-     <string name="inscriptionSuccess"> Vous êtes inscrit ! </string>
-    
+
+    <!-- Strings de l'activité Inscription -->
+    <string name="confirmerMotdepasse"> Confirmer mot de passe </string>
+    <string name="inscriptionSuccess"> Vous êtes inscrit ! </string>
+  
+     <!-- Strings de l'activité Profil -->
+     <string name="typeDePoint"> Type de point </string>
+     <string name="nombre"> Nombre </string>
+     
+     <!-- Strings des toasts -->
+   	 <string name="toastNoConnexion">  Votre appareil n\'est pas connecté </string>
 
 </resources>
