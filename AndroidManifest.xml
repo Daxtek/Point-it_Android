@@ -49,6 +49,10 @@
             android:name=".Profil"
             android:label="@string/title_activity_profil" >
         </activity>
+        <activity
+            android:name=".Classement"
+            android:label="@string/title_activity_classement" >
+        </activity>
     </application>
 
 </manifest>
