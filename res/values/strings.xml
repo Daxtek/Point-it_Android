@@ -52,6 +52,10 @@
 	<string name="description"> Description </string>
 	<string name="epique"> Epique </string>
 	<string name="prendCa"> Prends-ça !</string>
+	
+	<!-- Strings de la liste des points -->
+	<string name="boutonApprouver"> Approuver </string>
+    <string name="boutonPoster"> Poster </string>
 
     <!-- Strings des toasts -->
     <string name="toastNoConnexion">  Votre appareil n\'est pas connecté </string>

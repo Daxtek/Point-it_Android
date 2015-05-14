@@ -2,6 +2,8 @@ package com.example.point_it_android;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -12,15 +14,31 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class Accueil extends Activity 
 {
 	//Déclaration des variables
-	Button boutonVersProfil , boutonVersClassement , boutonVersInscription , boutonVersConnexion , boutonVersAjoutPoint;
-	ArrayList<Button> BoutonsCacheListe; //Liste des boutons à faire apparaitre quand on est connecté, les boutons qui sont cachés au départ
-	TextView connecte;
+	private Button boutonVersProfil , boutonVersClassement , boutonVersInscription , boutonVersConnexion , boutonVersAjoutPoint;
+	private ArrayList<Button> BoutonsCacheListe; //Liste des boutons à faire apparaitre quand on est connecté, les boutons qui sont cachés au départ
+	private TextView connecte;
+	private LinearLayout layoutCommentaires;
+	
+	//Variables en rapport avec la liste
+	private	ArrayAdapter<String> adapter;
+	private ListView listePoint;
+	private	ArrayList<ListItem> listItems;
+	private String[] listString ;
+	
+	
+	//Variables en rapport avec le JSON   
+	//JSONParser jParser = new JSONParser();
+	private JSONArray  donnees_element = null ; // Tableau JSON des données   
+	private ArrayList<String> liste_descriptionPoint , liste_recup_descriptionPoint ;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +58,15 @@ public class Accueil extends Activity
 		BoutonsCacheListe.add(boutonVersClassement );
 		BoutonsCacheListe.add(boutonVersProfil );
 		BoutonsCacheListe.add(boutonVersAjoutPoint );
+		
+		
+		liste_descriptionPoint = new ArrayList<String>();
+		
+		//récupération des donnees des points via connexion à la base !
+		
+		liste_descriptionPoint.add("un point description blabla"); //Ajout de description test
+		liste_descriptionPoint.add("un point description blabla2"); //Ajout de description test
+		listInitialisation(liste_descriptionPoint);
 	
 		Log.v("Accueil", "Connexion.connecte" + Connexion.connecte);
 		if(Connexion.connecte ) //Si on est connecté au site Point-it
@@ -64,11 +91,27 @@ public class Accueil extends Activity
 			{
 				BoutonsCacheListe.get(i).setVisibility(View.GONE);
 			}
-			
-
-			
 		}
 	}
+	
+	/**
+	 * Initialise la liste des points
+	 */
+	public void listInitialisation( ArrayList<String> descriptionPoint /*, ArrayList<ArrayList<String>> personneConcerne*/)
+	{
+		listePoint = (ListView) findViewById(R.id.ListePoint);
+		listItems = new ArrayList<ListItem>();
+		
+		for ( int i = 0 ; i<descriptionPoint.size() ; i++) // Ajout des contenus ( texte ) dans les élements de la liste
+		{
+			//Log.v("ListeViaBDD" , "nom["+i+"] "+nom.get(i));
+			listItems.add(new ListItem( descriptionPoint.get(i) ) );
+		}
+		listePoint.setAdapter(new CustomListViewAdapter(this, listItems)); // Défini l'adapter personnaliser
+	}
+	
+	
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
