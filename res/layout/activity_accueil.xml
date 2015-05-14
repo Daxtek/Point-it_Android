@@ -49,13 +49,22 @@
         android:text="@string/boutonProfil"
         android:visibility="gone" />
         
-         <Button
+       <Button
         android:id="@+id/boutonVersClassement"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:onClick="Classement"
         android:text="@string/boutonClassement"
+        android:visibility="gone" />
+       
+        <Button
+        android:id="@+id/boutonVersAjoutPoint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:onClick="AjoutPoint"
+        android:text="@string/boutonAjoutPoint"
         android:visibility="gone" />
 
 </LinearLayout>

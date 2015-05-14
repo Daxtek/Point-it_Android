@@ -53,6 +53,10 @@
             android:name=".Classement"
             android:label="@string/title_activity_classement" >
         </activity>
+        <activity
+            android:name=".AjoutPoint"
+            android:label="@string/title_activity_ajout_point" >
+        </activity>
     </application>
 
 </manifest>

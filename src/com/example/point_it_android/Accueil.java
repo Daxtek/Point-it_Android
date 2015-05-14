@@ -18,8 +18,8 @@ import android.widget.TextView;
 public class Accueil extends Activity 
 {
 	//Déclaration des variables
-	Button boutonVersProfil , boutonVersClassement , boutonVersInscription , boutonVersConnexion;
-	ArrayList<Button> BoutonsListe; //Liste des boutons
+	Button boutonVersProfil , boutonVersClassement , boutonVersInscription , boutonVersConnexion , boutonVersAjoutPoint;
+	ArrayList<Button> BoutonsCacheListe; //Liste des boutons à faire apparaitre quand on est connecté, les boutons qui sont cachés au départ
 	TextView connecte;
 	
 	@Override
@@ -29,24 +29,27 @@ public class Accueil extends Activity
 		
 		//Initialisation des variables
 		connecte = (TextView)findViewById(R.id.connecte);
-		//BoutonsListe = new ArrayList<Button>();
-		boutonVersProfil= (Button)findViewById(R.id.boutonVersProfil);
-		boutonVersClassement = (Button)findViewById(R.id.boutonVersClassement);
+		
 		boutonVersInscription  = (Button)findViewById(R.id.boutonVersInscription);
 		boutonVersConnexion  = (Button)findViewById(R.id.boutonVersConnexion);
+		boutonVersProfil= (Button)findViewById(R.id.boutonVersProfil);
+		boutonVersClassement = (Button)findViewById(R.id.boutonVersClassement);
+		boutonVersAjoutPoint  = (Button)findViewById(R.id.boutonVersAjoutPoint);
 		
-		/*BoutonsListe.add(boutonVersProfil );
-		BoutonsListe.add(boutonVersClassement );
-		BoutonsListe.add(boutonVersInscription );
-		BoutonsListe.add(boutonVersConnexion );*/
+		BoutonsCacheListe = new ArrayList<Button>();
+		BoutonsCacheListe.add(boutonVersClassement );
+		BoutonsCacheListe.add(boutonVersProfil );
+		BoutonsCacheListe.add(boutonVersAjoutPoint );
 	
 		Log.v("Accueil", "Connexion.connecte" + Connexion.connecte);
 		if(Connexion.connecte ) //Si on est connecté au site Point-it
 		{
 			connecte.setText(getResources().getString(R.string.connexionSuccess));
 			//Affiche les boutons
-			boutonVersProfil.setVisibility(View.VISIBLE);
-			boutonVersClassement.setVisibility(View.VISIBLE);
+			for(int i = 0 ; i<BoutonsCacheListe.size() ; i++)
+			{
+				BoutonsCacheListe.get(i).setVisibility(View.VISIBLE);
+			}
 			
 			boutonVersConnexion.setVisibility(View.GONE); //Cache le bouton de connexion
 			boutonVersInscription.setVisibility(View.GONE); //Cache le bouton d'inscription
@@ -56,9 +59,11 @@ public class Accueil extends Activity
 		else //Si on est pas connecté
 		{
 			connecte.setText(getResources().getString(R.string.notConnected));
-			//Cache les boutons autres que celui de connection 
-			boutonVersProfil.setVisibility(View.GONE);
-			boutonVersClassement.setVisibility(View.GONE);
+			//Cache les boutons autres que celui de connection et inscription
+			for(int i = 0 ; i<BoutonsCacheListe.size() ; i++)
+			{
+				BoutonsCacheListe.get(i).setVisibility(View.GONE);
+			}
 			
 
 			
@@ -100,8 +105,18 @@ public class Accueil extends Activity
 	 */
 	public void Classement(View v)
 	{
-		//Intent intent = new Intent(this,Classement.class); //Défini l'intent
-		//startActivity(intent); //Lance l'intent
+		Intent intent = new Intent(this,Classement.class); //Défini l'intent
+		startActivity(intent); //Lance l'intent
+	}
+	
+	/**
+	 * Lance l'activité AjoutPoint
+	 * @param v
+	 */
+	public void AjoutPoint(View v)
+	{
+		Intent intent = new Intent(this,AjoutPoint.class); //Défini l'intent
+		startActivity(intent); //Lance l'intent
 	}
 	
 	/**
