@@ -57,7 +57,7 @@ public class Accueil extends Activity
 		
 		BoutonsCacheListe = new ArrayList<Button>();
 		BoutonsCacheListe.add(boutonVersClassement );
-		BoutonsCacheListe.add(boutonVersProfil );
+		//BoutonsCacheListe.add(boutonVersProfil );
 		BoutonsCacheListe.add(boutonVersAjoutPoint );
 		
 		

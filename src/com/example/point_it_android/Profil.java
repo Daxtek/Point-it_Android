@@ -1,15 +1,18 @@
 package com.example.point_it_android;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -22,12 +25,16 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.LinearLayout.LayoutParams;
+
 
 
 public class Profil extends Activity {
@@ -36,6 +43,8 @@ public class Profil extends Activity {
 	private ListView ListeDesPoints;
 	private TextView Nom_et_Img;
 	private TableLayout TableauPoint;
+	private LinearLayout LinearLayoutImgetTxt;
+	private ImageView ImgProfil;
 	private SharedPreferences profilPreferences; // Preferences ( Sauvegarde) du profil
 	SharedPreferences.Editor mEditor; 
 	
@@ -49,6 +58,10 @@ public class Profil extends Activity {
 	RecupDonnees asyncTaskRecupDonnees;
 	private ArrayList<String> TypesDePoint , NombresDePoint;
 	
+	//DŽfinition du spinner via son layout
+	ProgressBar loadingSpinner ;
+
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,18 +72,25 @@ public class Profil extends Activity {
 		ListeDesPoints = (ListView)findViewById(R.id.ListeDesPoints);
 		Nom_et_Img = (TextView)findViewById(R.id.PseudoEtImgDuProfil);
 		TableauPoint = (TableLayout)findViewById(R.id.TableauDuProfil);
+		LinearLayoutImgetTxt = (LinearLayout)findViewById(R.id.LinearLayoutImgetTitre);
+		ImgProfil = (ImageView)findViewById(R.id.ImgDuProfil);
 		
 		profilPreferences = getSharedPreferences("prefProfil", 0); //récupération des préférences du profil
 		mEditor = profilPreferences.edit();
 		
+		mEditor.clear().commit();
+		
 		TypesDePoint = new ArrayList<String>(); 
 		NombresDePoint = new ArrayList<String>(); 
+		
+		 loadingSpinner = new ProgressBar(this);
+			loadingSpinner = (ProgressBar)(getLayoutInflater().inflate(R.layout.loading_spinner, null));
+			loadingSpinner.setVisibility(View.GONE);
+			LinearLayoutImgetTxt.addView(loadingSpinner);
 		
 		if(isOnline() && profilPreferences.getAll().isEmpty()) //Si on est connecté et que les préférences sont vides
 		{
 			lauchRecupDonnee();
-			
-			
 			
 			
 		}
@@ -181,10 +201,12 @@ public class Profil extends Activity {
 			Nom_et_Img.setCompoundDrawables(null, null, null, null/*bottom*/);
 			
 			
-			
+			//Place les données
 			for(int i=0 ; i</*NB_types_de_point_*/TypesDePoint.size() ; i++)
 			{
 				TableRow tableRow = new TableRow(getApplicationContext()); //Créer une nouvelle ligne
+				tableRow.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+				tableRow.setGravity(Gravity.CENTER);
 				
 				TextView typedepoint = new TextView(getApplicationContext()); // Créer le textView qui contient le type de point
 				typedepoint.setText(TypesDePoint.get(i));
@@ -204,6 +226,17 @@ public class Profil extends Activity {
 				TableauPoint.addView(tableRow); 	//Ajout la ligne dans le tableau
 				
 			}
+			
+			//DŽfinition du texte view de l'img indisponible
+			TextView TVImgIndisponible = new TextView(getApplicationContext());
+			TVImgIndisponible.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+			TVImgIndisponible.setGravity(Gravity.CENTER);
+			TVImgIndisponible.setText(getString(R.string.imgNonDisponible));
+			TVImgIndisponible.setTextColor(Color.RED);
+			TVImgIndisponible.setVisibility(View.GONE);
+			
+			//Lance le téléchargement de l'img
+			new DownloadImageTask(ImgProfil ,  loadingSpinner , TVImgIndisponible  ).execute("http://pointit.fr/assets/images/member.png");
 			
 			
 			
@@ -247,6 +280,130 @@ public class Profil extends Activity {
 		getMenuInflater().inflate(R.menu.profil, menu);
 		return true;
 	}
+	
+	
+	/**
+	 * T‰che asynchrone qui tŽlŽcharge l'image venant de l'url passŽ en param�tre et la place dans l'ImageView passŽ en param�tre
+	 * @author DieudonnŽ Lo•c
+	 *
+	 */
+	private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+		ImageView imgProfil;
+	    ProgressBar loadingSpinner;
+	    TextView TVImgIndisponible;
+	    Boolean ErreurImage = false;
+	    
+	    //constructor
+	    public DownloadImageTask(ImageView imgProfil , ProgressBar loadingSpinner ,  TextView TVImgIndisponible  ) {
+	        this.imgProfil = imgProfil;
+	        this.loadingSpinner = loadingSpinner;
+	        this.TVImgIndisponible = TVImgIndisponible;
+	    
+	    }
+	    
+	   //Avant le tŽlŽchargement de l'image affiche la roue de chargment
+	    protected void onPreExecute() {
+	    	loadingSpinner.setVisibility(View.VISIBLE);
+	    	super.onPreExecute();
+	    }
+	    
+	    // laoding picture and put it into bitmap 
+	    protected Bitmap doInBackground(String... urls) {
+	        String urldisplay = urls[0]; //RŽcup�re l'url passŽ en argument
+	        Bitmap bitmapImage = null; //Initialise le Bitmap
+	        InputStream in = null;
+	
+	          try {
+				in = new java.net.URL(urldisplay).openStream(); //Initialise et ouvre l'input Stream
+			} catch (MalformedURLException e2) {
+				e2.printStackTrace();
+			} catch (IOException e2) {
+				e2.printStackTrace();
+			} 
+	          
+	        
+		      final BitmapFactory.Options options = new BitmapFactory.Options();
+		  	  options.inJustDecodeBounds = false;
+		  	  /*if (screenWidth <= 320) // dŽfini ...
+	          {
+		  	    	options.inSampleSize = 12;
+	          } 
+		  	  else if (screenWidth <= 480)
+		  	  {
+		  		  options.inSampleSize = 8;
+		  	  }
+		  	  else
+		  	  {
+		  		  options.inSampleSize = 4;
+		  	  }*/
+		  	try {
+	          bitmapImage = BitmapFactory.decodeStream(in , null, options);
+	          
+	          
+	        } catch (Error e) {
+	           
+	            try {
+					in.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	            ErreurImage = true;
+	            e.printStackTrace();
+	            return null;
+	        } catch (Exception e) {
+	            try {
+					in.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	            ErreurImage = true;
+	            e.printStackTrace();
+	            return null;
+	        }
+	        
+	        
+	        //Sauvegarde de l'image au format Base64 , pour pouvoir la stocker sous forme de string. car on ne peut pas stocker directement des Bitmaps
+	        /*try{
+		        ByteArrayOutputStream baos = new ByteArrayOutputStream(); //Conversion du bitmap en string a l'aide de base64
+		        bitmapImage.compress(Bitmap.CompressFormat.JPEG, 100, baos);   
+		        byte[] b = baos.toByteArray(); 
+		        String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
+	        	mEditor.putString("image_profil",encodedImage).commit(); //Sauvegarde l'image du profil sous forme de string
+		    }catch(Error e){ //G�re les exception et erreurs et met une image "Img non disponible"
+		    	
+		    }
+			catch(Exception e){
+		    }
+	        try {
+				in.close(); //Ferme l'input Stream
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}*/
+	        return bitmapImage;
+	    }
+	    
+	    //after downloading
+	    protected void onPostExecute(Bitmap result) 
+	    {	
+	    	loadingSpinner.setVisibility(View.GONE);
+	    	Log.v("Profil", "result " + result);
+	    	if(ErreurImage || result == null )
+	    	{
+				TVImgIndisponible.setVisibility(View.VISIBLE);
+	    	}
+	    	else
+	    	{
+	    		imgProfil.setImageBitmap(result); //Attribut l'image au TextView
+	    	}
+	       
+	       
+	    }
+	  }
+	
+	
 	
 	/**
 	 * Test si le device est connecté à internet

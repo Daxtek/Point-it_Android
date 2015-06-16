@@ -47,7 +47,7 @@
         android:layout_gravity="center"
         android:onClick="Profil"
         android:text="@string/boutonProfil"
-        android:visibility="gone" />
+         /> <!-- android:visibility="gone" -->
         
        <Button
         android:id="@+id/boutonVersClassement"

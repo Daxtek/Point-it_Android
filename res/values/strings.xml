@@ -64,6 +64,7 @@
     <string name="toastNonConnecterApprouver">  Vous devez être connecté pour approuver un point </string>
     <string name="toastRecupDonnee">  Récupération des données</string>
     <string name="toastUpdateFail">  Récupération impossible, vérifiez votre connexion</string>
+    <string name="imgNonDisponible">  Image non disponible</string>
   
 
 </resources>
