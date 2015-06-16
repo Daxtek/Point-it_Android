@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Accueil extends Activity 
 {
@@ -68,8 +69,23 @@ public class Accueil extends Activity
 		liste_descriptionPoint.add("un point description blabla2"); //Ajout de description test
 		listInitialisation(liste_descriptionPoint);
 	
+		Interface();
+	}
+	
+	public void onResume()
+	{
 		Log.v("Accueil", "Connexion.connecte" + Connexion.connecte);
-		if(Connexion.connecte ) //Si on est connecté au site Point-it
+		
+		Interface();
+		super.onResume();
+	}
+	
+	/**
+	 * Vérifie si on est connecté et adapte l'interface en fonction
+	 */
+	public void Interface()
+	{
+		if(isConnected() ) //Si on est connecté au site Point-it
 		{
 			connecte.setText(getResources().getString(R.string.connexionSuccess));
 			//Affiche les boutons
@@ -110,7 +126,39 @@ public class Accueil extends Activity
 		listePoint.setAdapter(new CustomListViewAdapter(this, listItems)); // Défini l'adapter personnaliser
 	}
 	
+	/**
+	 * Approuve le point
+	 */
+	public void Approuver(View v)
+	{
+		if(Connexion.connecte)
+		{
+			
+		}
+		else
+		{
+			
+			Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastNonConnecterApprouver), Toast.LENGTH_SHORT).show();
+			Connexion(v);
+		}
+	}
 	
+	/**
+	 * Vérifie si on est connecté au site Point-it
+	 * @return
+	 */
+	public boolean isConnected()
+	{
+		Log.v("Accueil", "Connexion.connecte" + Connexion.connecte);
+		if(Connexion.connecte ) //Si on est connecté au site Point-it
+		{
+			return true;
+		}
+		else //Si on est pas connecté
+		{
+			return false;
+		}
+	}
 	
 
 	@Override
@@ -180,6 +228,25 @@ public class Accueil extends Activity
 	{
 		Intent intent = new Intent(this,Inscription.class); //Défini l'intent
 		startActivity(intent); //Lance l'intent
+	}
+	
+	/**
+	 * Lance l'activité commenter
+	 * @param v
+	 */
+	public void Commenter(View v)
+	{
+		if(Connexion.connecte)
+		{
+			Intent intent = new Intent(this,Commenter.class); //Défini l'intent
+			startActivity(intent); //Lance l'intent
+		}
+		else
+		{
+			
+			Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastNonConnecterApprouver), Toast.LENGTH_SHORT).show();
+			Connexion(v);
+		}
 	}
 	
 	/**

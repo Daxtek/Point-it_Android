@@ -12,7 +12,8 @@
     <string name="title_activity_inscription">Inscription</string>
     <string name="title_activity_profil">Profil</string>
     <string name="title_activity_classement">Classement</string>
-     <string name="title_activity_ajout_point">AjoutPoint</string>
+    <string name="title_activity_ajout_point">AjoutPoint</string>
+    <string name="title_activity_commenter">Commenter</string>
 
     <!-- Strings de l'activité Accueil -->
     <string name="messageAccueil"> Bienvenue sur l\'application Point-it </string>
@@ -46,22 +47,23 @@
     <string name="nazi"> Nazi </string>
     <string name="princesse"> Princesse </string>
     <string name="vietnam"> Vietnam </string>
-    
+
     <!-- Strings de l'activité AjoutPoint -->
-	<string name="personnes"> Personnes </string>
-	<string name="description"> Description </string>
-	<string name="epique"> Epique </string>
-	<string name="prendCa"> Prends-ça !</string>
-	
-	<!-- Strings de la liste des points -->
-	<string name="boutonApprouver"> Approuver </string>
-    <string name="boutonPoster"> Poster </string>
+    <string name="personnes"> Personnes </string>
+    <string name="description"> Description </string>
+    <string name="epique"> Epique </string>
+    <string name="prendCa"> Prends-ça !</string>
+
+    <!-- Strings de la liste des points -->
+    <string name="boutonApprouver"> Approuver </string>
+    <string name="boutonCommenter"> Commenter </string>
 
     <!-- Strings des toasts -->
     <string name="toastNoConnexion">  Votre appareil n\'est pas connecté </string>
     <string name="toastFormulaireAjoutPointMalRemplis">  Vous devez remplir le champs personne et le champs description pour ajouter un point </string>
-   
-    
+    <string name="toastNonConnecterApprouver">  Vous devez être connecté pour approuver un point </string>
+    <string name="toastRecupDonnee">  Récupération des données</string>
+    <string name="toastUpdateFail">  Récupération impossible, vérifiez votre connexion</string>
   
 
 </resources>

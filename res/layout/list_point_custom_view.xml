@@ -34,11 +34,18 @@
 			     android:text="@string/boutonApprouver"
 			     android:onClick="Approuver" />
 			 
+			 <Button
+	 	     android:id="@+id/boutonPoster"
+	 	     android:layout_width="fill_parent"
+	 	     android:layout_height="wrap_content"
+	 	     android:onClick="Commenter"
+	 	     android:text="@string/boutonCommenter" />
+			 
 			
 	 
 	 </LinearLayout>
 	 
-	 <LinearLayout
+	<!--   <LinearLayout
 	     android:id="@+id/layoutCommentaires"
 	     android:layout_width="match_parent"
 	     android:layout_height="match_parent"
@@ -61,13 +68,14 @@
 	          android:maxLength="1000"
 	          android:maxLines="4" />
 			 
-	 	 <Button
+	 	  
+			 <Button
 	 	     android:id="@+id/boutonPoster"
 	 	     android:layout_width="fill_parent"
 	 	     android:layout_height="wrap_content"
 	 	     android:onClick="Poster"
-	 	     android:text="@string/boutonPoster" />
+	 	     android:text="@string/boutonCommenter" />
 	 	
-	 </LinearLayout>
+	 </LinearLayout> -->
     
 </LinearLayout>

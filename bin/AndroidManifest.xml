@@ -57,6 +57,10 @@
             android:name=".AjoutPoint"
             android:label="@string/title_activity_ajout_point" >
         </activity>
+        <activity
+            android:name=".Commenter"
+            android:label="@string/title_activity_commenter" >
+        </activity>
     </application>
 
 </manifest>
