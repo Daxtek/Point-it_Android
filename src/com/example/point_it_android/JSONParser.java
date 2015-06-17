@@ -54,9 +54,10 @@ public class JSONParser {
                // request method is POST
                // defaultHttpClient
                DefaultHttpClient httpClient = new DefaultHttpClient();
+               Log.d("JSONParser", "url "+ url);
                HttpPost httpPost = new HttpPost(url);
                httpPost.setEntity(new UrlEncodedFormEntity(params));
-
+               
                HttpResponse httpResponse = httpClient.execute(httpPost);
                HttpEntity httpEntity = httpResponse.getEntity();
                is = httpEntity.getContent();
@@ -99,6 +100,7 @@ public class JSONParser {
 
        // try parse the string to a JSON object
        try {
+    	   Log.d("JSONParser", "json "+ json);
            jObj = new JSONObject(json);
        } catch (JSONException e) {
     	   if(BuildConfig.DEBUG) //Si on se trouve en version debug, alors on affiche des messages dans le Logcat
@@ -108,6 +110,7 @@ public class JSONParser {
        }
 
        // return JSON String
+       Log.d("JSONParser", "jObj "+ jObj);
        return jObj;
 
    }

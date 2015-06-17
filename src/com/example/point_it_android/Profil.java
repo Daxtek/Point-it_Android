@@ -1,11 +1,19 @@
 package com.example.point_it_android;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.example.point_it_android.Connexion.ConnexionAsyncTask;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -19,6 +27,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -47,6 +56,14 @@ public class Profil extends Activity {
 	private ImageView ImgProfil;
 	private SharedPreferences profilPreferences; // Preferences ( Sauvegarde) du profil
 	SharedPreferences.Editor mEditor; 
+	ConnexionAsyncTask connexionAsyncTask;
+	private String url_connexion = "http://192.168.1.94/Point-it/index.php/api/login";
+	
+	// JSON Node names
+    private static final String TAG_SUCCESS = "success";
+    private static final String TAG_ERRORS = "errors";
+    private static final String TAG_DATA ="data";
+    private int NB_Item;
 	
 	// Progress Dialog
 	private ProgressDialog progressDialog;
@@ -54,6 +71,16 @@ public class Profil extends Activity {
 	//Variables en rapport avec le JSON   
 	JSONParser jParser = new JSONParser();
 	private JSONArray  donnees_element = null ; // Tableau JSON des donnŽes   
+	
+	private String url_profil = "http://192.168.1.94/Point-it/index.php/api/getProfil";
+	
+	// JSON Node names
+    private static final String TAG_POINT = "point";
+    private static final String TAG_PROFIL = "profil";
+    private static final String TAG_NB_POINT = "nbPoint";
+    private static final String TAG_TABLE_POINT = "table_point";
+    private static final String TAG_NOMBRE = "nombre";
+    private static final String TAG_TYPEPT_NOM = "typept_nom";
 	
 	RecupDonnees asyncTaskRecupDonnees;
 	private ArrayList<String> TypesDePoint , NombresDePoint;
@@ -78,25 +105,71 @@ public class Profil extends Activity {
 		profilPreferences = getSharedPreferences("prefProfil", 0); //récupération des préférences du profil
 		mEditor = profilPreferences.edit();
 		
-		mEditor.clear().commit();
+		Log.d("Profil", "profilPreferences.getAll().isEmpty() " +  profilPreferences.getAll().isEmpty());
+		Log.d("Profil", "profilPreferences.getAll() " +  profilPreferences.getAll());
 		
+		String prefID = profilPreferences.getString("id", "");
+		Log.d("Profil" , "prefID "+ prefID);
+		if(!prefID.isEmpty() && !Connexion.id.equals(prefID) ) //Si l'id sauvegardé est différente de celle qui essaye d'accéder
+		{
+			mEditor.clear().commit();
+		}
+		else if (prefID.isEmpty()) //Si l'id de préférence est vide
+		{
+			Log.d("Profil" , "Vides les préfes paske perfID est vide ");
+			mEditor.clear().commit();
+		}
+		
+		//
+		
+
 		TypesDePoint = new ArrayList<String>(); 
 		NombresDePoint = new ArrayList<String>(); 
 		
-		 loadingSpinner = new ProgressBar(this);
-			loadingSpinner = (ProgressBar)(getLayoutInflater().inflate(R.layout.loading_spinner, null));
-			loadingSpinner.setVisibility(View.GONE);
-			LinearLayoutImgetTxt.addView(loadingSpinner);
+		loadingSpinner = new ProgressBar(this);
+		loadingSpinner = (ProgressBar)(getLayoutInflater().inflate(R.layout.loading_spinner, null));
+		loadingSpinner.setVisibility(View.GONE);
+		LinearLayoutImgetTxt.addView(loadingSpinner);
 		
 		if(isOnline() && profilPreferences.getAll().isEmpty()) //Si on est connecté et que les préférences sont vides
 		{
+			//lauchConnexion();
 			lauchRecupDonnee();
 			
 			
 		}
 		else if (!profilPreferences.getAll().isEmpty()) //Si les préférences ne sont pas vides on les places
 		{
+			Log.d("Profil" , "NB_ITEM " + profilPreferences.getInt("NB_ITEM", 0) );
+			NB_Item = profilPreferences.getInt("NB_ITEM", 0);
+			for ( int i = 0 ; i<NB_Item+1 ; i++)
+			{
+				Log.d("Profil" , "profilPreferences.getString(TAG_NOMBRE+i " + profilPreferences.getString(TAG_NOMBRE+i, "") );
+				NombresDePoint.add( profilPreferences.getString(TAG_NOMBRE+i, ""));   //rŽcup�re la donnŽe de l'objet et la place dans la arraylist de donnŽe
+				TypesDePoint.add( profilPreferences.getString(TAG_TYPEPT_NOM+i, ""));   //rŽcup�re la donnŽe de l'objet et la place dans la arraylist de donnŽe
+  
+			}
+			Nom_et_Img.setText(profilPreferences.getString("nom" , ""));
 			
+			PlacementDonneesTableau();
+			/*String image = profilPreferences.getString("image_data", "");
+			
+			if( !image.equalsIgnoreCase("") ){
+				
+				
+				try{
+					byte[] b = Base64.decode(image, Base64.DEFAULT);
+					Bitmap bitmapAffiche = BitmapFactory.decodeByteArray(b, 0, b.length);					
+					ImgProfil.setImageBitmap(bitmapAffiche);
+
+				}catch(Error e){ //G�re les exception et erreurs et met une image "Img non disponible"	
+					//TVImgIndisponible.setVisibility(View.VISIBLE);
+				}
+				catch(Exception e){
+					//TVImgIndisponible.setVisibility(View.VISIBLE);		
+				} 
+				
+			}*/
 		}
 		else
 		{
@@ -117,6 +190,7 @@ public class Profil extends Activity {
 		int toastMessage;
 		int NB_Item_preference;
 		boolean comingFromUpdate;
+		JSONArray table_point;
 		
 		RecupDonnees(int toastMessage) //Constructeur avec le message seul
 		{
@@ -142,52 +216,50 @@ public class Profil extends Activity {
 		@Override
 		protected String doInBackground(String... params) 
 		{ 
-			/*tableau_produit = new ArrayList<String>();//initialisation de la arrayliste
-    		tableau_nom = new ArrayList<String>();//initialisation de la arrayliste
-    		
-    		// getting JSON string from URL
-        JSONObject json = jParser.makeHttpRequest(urlListe, "GET", parametres);
-         try 
-         { 	
-         	if (!json.isNull("donnees"))//SŽcuritŽ si le json rŽcupŽrŽ n'est pas vide
-         	{
-         		donnees_element = json.getJSONArray("donnees"); 
-         		for(int  i = 0 ; i<donnees_element.length() ; i++) //Parcours le tableau de donnees JSON
-         		{
-         			JSONObject c = donnees_element.getJSONObject(i); //RŽcup�re l'objet ˆ la position i du tableau 
-         			int lastIndexProduit = 0 ;
-     				int lastIndexNom  = 0;
-         			for( int j = 0 ; j<tableau_tag_donnees.length ; j++) //Parcours l'intŽrieur d'un ŽlŽments du tableau
-             		{            		
-         				
-         				if(tableau_tag_donnees[j].equals("produit") )
-	            			{
-	            				tableau_produit.add( c.getString(tableau_tag_donnees[j]));  //rŽcup�re la donnŽe de l'objet et la place dans la arraylist de donnŽe
-	            				lastIndexProduit  =tableau_produit.size() -1;
-	            				mEditor.putString("produit"+lastIndexProduit, tableau_produit.get(lastIndexProduit)).commit(); // Sauvegarde chaque donnees dans les prŽfŽrences
-	            			}
-	            			if(tableau_tag_donnees[j].equals("nom") )
-	            			{
-	            				tableau_nom.add( c.getString(tableau_tag_donnees[j]));  //rŽcup�re la donnŽe de l'objet et la place dans la arraylist de donnŽe
-	            				lastIndexNom  =tableau_nom.size() -1;
-	            				mEditor.putString("nom"+lastIndexNom, tableau_nom.get(lastIndexNom)).commit(); // Sauvegarde chaque donnees dans les prŽfŽrences
-	            			}
-             		}
-         			Pair<String , String> Pair = new Pair<String , String>(tableau_nom.get(lastIndexNom) ,tableau_produit.get(lastIndexProduit)); //CrŽation de la paire d'objet
-         			listPair.add(Pair);  //Ajout de la paire dans la liste
-         			
-         			
-         		}
-         	
-         	}*/
-			
-			TypesDePoint.add("Moustache");
-			NombresDePoint.add("3");
-			TypesDePoint.add("Princesse");
-			NombresDePoint.add("4");
-		
-			return null;
-		}
+			List<NameValuePair> parametres = new ArrayList<NameValuePair>();
+
+			 Log.d("Profil" , "url_profil "+url_profil);
+			 url_profil += "/"+Connexion.id;  //Ajoute l'id de la personne dans l'url
+	
+			 mEditor.putString("id", Connexion.id).commit(); // Sauvegarde l'id de l'utilisateur
+			 // getting JSON string from URL
+	         JSONObject json = jParser.makeHttpRequest(url_profil, "POST", parametres);
+	         Log.d("Profil" , "json "+json);
+	              
+	         try 
+	         { 	
+	        	 int lastIndex = 0;
+	         	if (!json.isNull(TAG_TABLE_POINT))//SŽcuritŽ si le json rŽcupŽrŽ n'est pas vide
+	         	{
+	         		table_point = json.getJSONArray(TAG_TABLE_POINT);
+	         		
+	         		for(int  i = 0 ; i<table_point.length() ; i++) //Parcours le tableau de donnees JSON
+	         		{
+	         			JSONObject c = table_point.getJSONObject(i); //RŽcup�re l'objet ˆ la position i du tableau 
+
+	         			NombresDePoint.add( c.getString(TAG_NOMBRE));  //rŽcup�re la donnŽe de l'objet et la place dans la arraylist de donnŽe
+	         			Log.d("Profil", "NombresDePoint "+ NombresDePoint);
+	         			lastIndex  =NombresDePoint.size()-1;
+		            	mEditor.putString(TAG_NOMBRE+lastIndex, NombresDePoint.get(lastIndex)).commit(); // Sauvegarde chaque donnees dans les prŽfŽrences
+						
+		            	TypesDePoint.add( c.getString(TAG_TYPEPT_NOM));  //rŽcup�re la donnŽe de l'objet et la place dans la arraylist de donnŽe
+		            	Log.d("Profil", "TypesDePoint "+ TypesDePoint);
+		            	mEditor.putString(TAG_TYPEPT_NOM+lastIndex, TypesDePoint.get(lastIndex)).commit(); // Sauvegarde chaque donnees dans les prŽfŽrences
+	         			
+		         	}
+		         	
+		         }
+	         	if(NombresDePoint.size() >0)
+	         	{
+	         		 mEditor.putInt("NB_ITEM", NombresDePoint.size()-1).commit(); // Sauvegarde le nombre de données dans les préférences
+	         	}
+	       
+			}catch (JSONException e) {
+		        e.printStackTrace();
+		    }
+				
+				return null;
+			}
 		
 		/**
 		 * Une fois la t‰che de fond fini, place les donnŽes dans la vue principale
@@ -197,35 +269,10 @@ public class Profil extends Activity {
 		{
 			progressDialog.dismiss(); // dismiss the dialog
 				
-			Nom_et_Img.setText("Thoumouuu");
-			Nom_et_Img.setCompoundDrawables(null, null, null, null/*bottom*/);
+			Nom_et_Img.setText(Connexion.nom);
+			mEditor.putString("nom" , Connexion.nom).commit();
 			
-			
-			//Place les données
-			for(int i=0 ; i</*NB_types_de_point_*/TypesDePoint.size() ; i++)
-			{
-				TableRow tableRow = new TableRow(getApplicationContext()); //Créer une nouvelle ligne
-				tableRow.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-				tableRow.setGravity(Gravity.CENTER);
-				
-				TextView typedepoint = new TextView(getApplicationContext()); // Créer le textView qui contient le type de point
-				typedepoint.setText(TypesDePoint.get(i));
-				typedepoint.setGravity(Gravity.CENTER);
-				typedepoint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-				typedepoint.setTextColor(Color.BLACK);
-				
-				TextView nombredepoint = new TextView(getApplicationContext()); // Créer le textView qui contient le nombre de point
-				Log.v("Profil" , "NombresDePoint.get(i) " + NombresDePoint.get(i) );
-				nombredepoint.setText(NombresDePoint.get(i));
-				nombredepoint.setGravity(Gravity.CENTER);
-				nombredepoint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-				nombredepoint.setTextColor(Color.BLACK);
-				
-				tableRow.addView(typedepoint);		
-				tableRow.addView(nombredepoint);		
-				TableauPoint.addView(tableRow); 	//Ajout la ligne dans le tableau
-				
-			}
+			PlacementDonneesTableau();
 			
 			//DŽfinition du texte view de l'img indisponible
 			TextView TVImgIndisponible = new TextView(getApplicationContext());
@@ -236,22 +283,45 @@ public class Profil extends Activity {
 			TVImgIndisponible.setVisibility(View.GONE);
 			
 			//Lance le téléchargement de l'img
-			new DownloadImageTask(ImgProfil ,  loadingSpinner , TVImgIndisponible  ).execute("http://pointit.fr/assets/images/member.png");
-			
-			
-			
-			
-			
-			//Ajout des descriptions point dans la liste
-			//ListeDesPoints.addView(child);
+			new DownloadImageTask(ImgProfil ,  loadingSpinner , TVImgIndisponible  ).execute(Connexion.url_image);
 			
 			//Ajout des données dans les préférences
 		}
 	}
 	
+	/**
+	 * Place les données dans le tableau
+	 */
+	public void PlacementDonneesTableau()
+	{
+		for(int i=0 ; i<TypesDePoint.size() ; i++)
+		{
+			TableRow tableRow = new TableRow(getApplicationContext()); //Créer une nouvelle ligne
+			tableRow.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+			tableRow.setGravity(Gravity.CENTER);
+			
+			TextView typedepoint = new TextView(getApplicationContext()); // Créer le textView qui contient le type de point
+			typedepoint.setText(TypesDePoint.get(i));
+			typedepoint.setGravity(Gravity.CENTER);
+			typedepoint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+			typedepoint.setTextColor(Color.BLACK);
+			
+			TextView nombredepoint = new TextView(getApplicationContext()); // Créer le textView qui contient le nombre de point
+			Log.v("Profil" , "NombresDePoint.get(i) " + NombresDePoint.get(i) );
+			nombredepoint.setText(NombresDePoint.get(i));
+			nombredepoint.setGravity(Gravity.CENTER);
+			nombredepoint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+			nombredepoint.setTextColor(Color.BLACK);
+			
+			tableRow.addView(typedepoint);		
+			tableRow.addView(nombredepoint);		
+			TableauPoint.addView(tableRow); 	//Ajout la ligne dans le tableau
+			
+		}
+	}
 	
 	/**
-	 * Lance lˆ tache de fondqui va rŽcupŽrer les donnŽes
+	 * Lance la tache de fondqui va rŽcupŽrer les donnŽes
 	 */
 	public void lauchRecupDonnee()
 	{
@@ -273,13 +343,130 @@ public class Profil extends Activity {
 			}
 		}, 30000 ); // DŽfinie la durŽe en milliseconde
 	}
+	
+	
+	
+	/**
+	 * Classe de t‰che asynchrone qui rŽcup�re ( en t‰che de fond ) les donnŽes de la base de donnŽes
+	 * @author Lo•c DieudonnŽ
+	 *
+	 */
+	/*class ConnexionAsyncTask extends AsyncTask<String,String , String>
+	{
+		int toastMessage;
+		int success ;
+        String errors ;
+        JSONObject data;
+		
+		ConnexionAsyncTask(int toastMessage) //Constructeur avec le message seul
+		{
+			this.toastMessage = toastMessage;
+			data = new JSONObject();
+		}
+		
+		/**
+		 * Avant de lancŽ la t‰che de fond, lance un dialog de chargement.
+		 */
+		/*@Override
+		protected void onPreExecute() {
+			//Progress Dialog 
+			progressDialog = new ProgressDialog(Profil.this);
+            progressDialog.setMessage(getString(toastMessage));
+            progressDialog.setIndeterminate(false);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+		}
+		
+		/**
+		 * RŽcup�re et stock les diffŽrentes donnŽes de la base
+		 */
+		/*@Override
+		protected String doInBackground(String... args) 
+		{ 
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("login", Connexion.login));
+            params.add(new BasicNameValuePair("password", Connexion.mdp));
+            
+            //Log.d("Connexion", "login "+ nomUtilisateur.getText().toString());
+            //Log.d("Connexion", "password "+ Mdp.getText().toString());
+
+            JSONObject json = jParser.makeHttpRequest(url_connexion, "POST", params);
+            
+           
+         // check log cat fro response
+            //Log.d("Connexion", "json "+json.toString());
+            
+            // check for success tag
+            try {
+                
+            	 success = json.getInt(TAG_SUCCESS);
+            	 Log.d("Connexion", "sucess "+ success);
+            	 if (success == 1) 
+            	 {
+	            	data = (JSONObject) json.get(TAG_DATA);
+	                Log.d("Connexion", "data "+ data);
+	                
+  
+                
+                } else {
+                	errors = json.getString(TAG_ERRORS);
+                	 Log.d("Connexion", "errors "+ errors);
+                }
+                
+            } catch (JSONException e) {
+                e.printStackTrace();
+               
+            }
+            
+			return null;
+		}
+		
+		/**
+		 * Une fois la t‰che de fond fini, place les donnŽes dans la vue principale
+		 */
+		/*@Override
+		protected void onPostExecute(String result) 
+		{
+			progressDialog.dismiss(); // dismiss the dialog
+			
+			lauchRecupDonnee();
+			 
+			
+		}
+	}*/
+	
+	
+
+	/**
+	 * Lance la connexion
+	 */
+	/*public void lauchConnexion()
+	{
+		connexionAsyncTask = new ConnexionAsyncTask(R.string.title_activity_connexion); //RŽcup�re la classe de la t‰che asynchrone avec le message de rŽcupŽration de donnŽes
+		connexionAsyncTask.execute( ); // Lance la t‰che asynchrone
+		Handler handler = new Handler();
+		// Si au bout de 30 secondes la rŽcupŽration de donnŽes est encore en train de tourner ( RUNNING ) alors on l'arr�te
+		handler.postDelayed(new Runnable()
+		{
+			public void run() 
+			{
+				if ( connexionAsyncTask.getStatus().equals(AsyncTask.Status.RUNNING) ) // VŽrification de si la t‰che est entrain de s'Žxecuter ( au statut RUNNING )
+				{ 
+					connexionAsyncTask.cancel(true); // Arr�te de la rŽcupŽration de donnŽe
+					progressDialog.dismiss(); // Arr�te la progressDialog
+					Toast.makeText(getApplicationContext(), R.string.toastConnexionFail, Toast.LENGTH_LONG ).show(); // Affiche un message d'erreur
+					finish();
+				}   
+			}
+		}, 30000 ); // DŽfinie la durŽe en milliseconde
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.profil, menu);
 		return true;
-	}
+	}*/
 	
 	
 	/**
@@ -375,13 +562,13 @@ public class Profil extends Activity {
 		    	
 		    }
 			catch(Exception e){
-		    }
+		    }*/
 	        try {
 				in.close(); //Ferme l'input Stream
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
-			}*/
+			}
 	        return bitmapImage;
 	    }
 	    

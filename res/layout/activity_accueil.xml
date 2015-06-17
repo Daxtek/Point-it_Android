@@ -47,7 +47,7 @@
         android:layout_gravity="center"
         android:onClick="Profil"
         android:text="@string/boutonProfil"
-         /> <!-- android:visibility="gone" -->
+        android:visibility="gone" /> <!--  -->
         
        <Button
         android:id="@+id/boutonVersClassement"
@@ -70,6 +70,7 @@
     <ListView
         android:id="@+id/ListePoint"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:visibility="gone" >
     </ListView>
 </LinearLayout>

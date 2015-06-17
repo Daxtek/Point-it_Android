@@ -48,7 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:onClick="login"
+        android:onClick="lauchConnexion"
         android:text="@string/buttonConnexion" />
 
 </LinearLayout>

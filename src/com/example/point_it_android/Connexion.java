@@ -6,11 +6,18 @@ import java.util.List;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.example.point_it_android.Profil.RecupDonnees;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +29,7 @@ public class Connexion extends Activity {
 	//Déclaration des variables
 	private EditText nomUtilisateur , Mdp;
 	public static boolean connecte;
+	Boolean erreur = false;
 	
 	// Progress Dialog
 	private ProgressDialog progressDialog;
@@ -29,8 +37,15 @@ public class Connexion extends Activity {
 	//Variables en rapport avec le JSON   
 	JSONParser jParser = new JSONParser();
 	private JSONArray  donnees_element = null ; // Tableau JSON des donnŽes   
-	//private ArrayList<String> tableau_produit , tableau_nom , tableau_recup_produit , tableau_recup_nom ;
-	//private String[] tableau_tag_donnees = {"produit" , "nom"}; 
+	private String url_connexion = "http://192.168.1.94/Point-it/index.php/api/login";
+	ConnexionAsyncTask connexionAsyncTask;
+	
+	 public static String url_image , id , nom , login , mdp;
+	
+	// JSON Node names
+    private static final String TAG_SUCCESS = "success";
+    private static final String TAG_ERRORS = "errors";
+    private static final String TAG_DATA ="data";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +57,10 @@ public class Connexion extends Activity {
 		Mdp = (EditText) findViewById(R.id.EditTextMDP);
 	}
 	
-	public void login(View view){
+	/*public void login(View view){
 	      if(nomUtilisateur.getText().toString().equals("admin") && Mdp.getText().toString().equals("admin"))
 	      {
-	    	  //Lancé la connexion
+	    	  //Lance la connexion
 	    	  connecte = true;
 	    	  Toast.makeText(getApplicationContext(), getResources().getString(R.string.connexionSuccess), Toast.LENGTH_SHORT).show();
 	    	  Accueil();
@@ -61,9 +76,34 @@ public class Connexion extends Activity {
 		      attempts.setText(Integer.toString(counter));
 		      if(counter==0){
 		         login.setEnabled(false);
-		      }*/
+		      }
 	      }
-	   }
+	   }*/
+	
+	
+	/**
+	 * Lance la connexion
+	 */
+	public void lauchConnexion(View v)
+	{
+		connexionAsyncTask = new ConnexionAsyncTask(R.string.title_activity_connexion); //RŽcup�re la classe de la t‰che asynchrone avec le message de rŽcupŽration de donnŽes
+		connexionAsyncTask.execute( ); // Lance la t‰che asynchrone
+		Handler handler = new Handler();
+		// Si au bout de 30 secondes la rŽcupŽration de donnŽes est encore en train de tourner ( RUNNING ) alors on l'arr�te
+		handler.postDelayed(new Runnable()
+		{
+			public void run() 
+			{
+				if ( connexionAsyncTask.getStatus().equals(AsyncTask.Status.RUNNING) ) // VŽrification de si la t‰che est entrain de s'Žxecuter ( au statut RUNNING )
+				{ 
+					connexionAsyncTask.cancel(true); // Arr�te de la rŽcupŽration de donnŽe
+					progressDialog.dismiss(); // Arr�te la progressDialog
+					Toast.makeText(getApplicationContext(), R.string.toastConnexionFail, Toast.LENGTH_LONG ).show(); // Affiche un message d'erreur
+					finish();
+				}   
+			}
+		}, 30000 ); // DŽfinie la durŽe en milliseconde
+	}
 	
 	
 	
@@ -72,15 +112,17 @@ public class Connexion extends Activity {
 	 * @author Lo•c DieudonnŽ
 	 *
 	 */
-	class RecupDonnees extends AsyncTask<String,String , String>
+	class ConnexionAsyncTask extends AsyncTask<String,String , String>
 	{
 		int toastMessage;
-		int NB_Item_preference;
-		boolean comingFromUpdate;
+		int success ;
+        String errors ;
+        JSONObject data;
 		
-		RecupDonnees(int toastMessage) //Constructeur avec le message seul
+		ConnexionAsyncTask(int toastMessage) //Constructeur avec le message seul
 		{
 			this.toastMessage = toastMessage;
+			data = new JSONObject();
 		}
 		
 		/**
@@ -100,52 +142,59 @@ public class Connexion extends Activity {
 		 * RŽcup�re et stock les diffŽrentes donnŽes de la base
 		 */
 		@Override
-		protected String doInBackground(String... params) 
+		protected String doInBackground(String... args) 
 		{ 
-			/*tableau_produit = new ArrayList<String>();//initialisation de la arrayliste
-    		tableau_nom = new ArrayList<String>();//initialisation de la arrayliste
-    		
-    		List<NameValuePair> parametres = new ArrayList<NameValuePair>();
-			if(pages !=null)
-			{
-				for(int x = 0; x<pages.length ; x++) //Parcours des diffŽrentes pages
-				{
-					
-					if ( famille) //Si on vient d'une page famille
-					{					
-						NameValuePair NVPid = new BasicNameValuePair("page", pages[x]); //DŽfini le param�tre "page=la_valeur_page"
-						parametres.add(NVPid);
-						
-						NameValuePair NVPfamille = new BasicNameValuePair("famille", ""+famille); //DŽfini le param�tre "famille=true"
-						parametres.add(NVPfamille);
-					
-					}
-					else //Si on nous demande juste une page ou un ensemble de pages
-					{
-						NameValuePair NVPid = new BasicNameValuePair("page", pages[x]); //DŽfini le param�tre "page=la_valeur_page"
-						parametres.add(NVPid);
-					}
-				
-					recuperation_des_donnees(parametres);
-				}
-			}
-			else //Si le tableau de pages n'est pas dŽfini
-			{
-				if (activitesInterieur) //Si on nous demandes toute les activites interieurs
-				{
-					NameValuePair NVPactivitesInterieur = new BasicNameValuePair("activitesInterieur", ""+activitesInterieur); //DŽfini le param�tre "activitesInterieur=true"
-					parametres.add(NVPactivitesInterieur);
-				}
-				else if (activitesExterieur) //Si on nous demandes toute les activites exterieurs
-				{
-					NameValuePair NVPactivitesExterieur = new BasicNameValuePair("activitesExterieur", ""+activitesExterieur); //DŽfini le param�tre "activitesExterieur=true"
-					parametres.add(NVPactivitesExterieur);
-				}
-				
-				recuperation_des_donnees(parametres);
-				
-			}*/
-		
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("login", nomUtilisateur.getText().toString()));
+            params.add(new BasicNameValuePair("password", Mdp.getText().toString()));
+            
+            /*Log.d("Connexion", "login "+ nomUtilisateur.getText().toString());
+            Log.d("Connexion", "password "+ Mdp.getText().toString());*/
+
+            JSONObject json = jParser.makeHttpRequest(url_connexion, "POST", params);
+            
+           
+         // check log cat fro response
+            Log.d("Connexion", "json "+json.toString());
+            
+            // check for success tag
+            try {
+                
+            	 success = json.getInt(TAG_SUCCESS);
+            	 Log.d("Connexion", "sucess "+ success);
+            	 if (success == 1) 
+            	 {
+            			 
+	            	data = (JSONObject) json.get(TAG_DATA);
+	                Log.d("Connexion", "data "+ data);
+	                url_image = (String) data.get("profil_image");
+	                id = (String) data.get("profil_id");
+	                nom = (String) data.get("profil_nom");
+	               
+	                Log.d("Connexion", "url_image "+url_image);
+	                Log.d("Connexion", "id "+id);
+	                Log.d("Connexion", "nom "+nom);
+	                
+	                login = nomUtilisateur.getText().toString();
+	                mdp = Mdp.getText().toString();
+  
+                   //Connection successed
+                	connecte = true;
+                	erreur = false;
+                	Accueil();
+                    // closing this screen
+                    finish();
+                } else {
+                	errors = json.getString(TAG_ERRORS);
+                	 Log.d("Connexion", "errors "+ errors);
+                	erreur = true;
+                }
+                
+            } catch (JSONException e) {
+                e.printStackTrace();
+               
+            }
+            
 			return null;
 		}
 		
@@ -157,8 +206,12 @@ public class Connexion extends Activity {
 		{
 			progressDialog.dismiss(); // dismiss the dialog
 			
-			View view = new View(getApplicationContext());
-			login(view);
+			Log.d("Connexion", "erreur "+ erreur);
+			if(erreur )
+			{	 
+				Toast.makeText(getApplicationContext(),  errors, Toast.LENGTH_SHORT).show();
+			}
+			 
 			
 		}
 	}

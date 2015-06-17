@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ public class Accueil extends Activity
 	private Button boutonVersProfil , boutonVersClassement , boutonVersInscription , boutonVersConnexion , boutonVersAjoutPoint;
 	private ArrayList<Button> BoutonsCacheListe; //Liste des boutons à faire apparaitre quand on est connecté, les boutons qui sont cachés au départ
 	private TextView connecte;
+	private Boolean estConnecte = false;
 	private LinearLayout layoutCommentaires;
 	
 	//Variables en rapport avec la liste
@@ -34,8 +36,7 @@ public class Accueil extends Activity
 	private ListView listePoint;
 	private	ArrayList<ListItem> listItems;
 	private String[] listString ;
-	
-	
+
 	//Variables en rapport avec le JSON   
 	//JSONParser jParser = new JSONParser();
 	private JSONArray  donnees_element = null ; // Tableau JSON des données   
@@ -57,10 +58,9 @@ public class Accueil extends Activity
 		
 		BoutonsCacheListe = new ArrayList<Button>();
 		BoutonsCacheListe.add(boutonVersClassement );
-		//BoutonsCacheListe.add(boutonVersProfil );
+		BoutonsCacheListe.add(boutonVersProfil );
 		BoutonsCacheListe.add(boutonVersAjoutPoint );
-		
-		
+
 		liste_descriptionPoint = new ArrayList<String>();
 		
 		//récupération des donnees des points via connexion à la base !
@@ -74,7 +74,7 @@ public class Accueil extends Activity
 	
 	public void onResume()
 	{
-		Log.v("Accueil", "Connexion.connecte" + Connexion.connecte);
+		
 		
 		Interface();
 		super.onResume();
@@ -93,6 +93,8 @@ public class Accueil extends Activity
 			{
 				BoutonsCacheListe.get(i).setVisibility(View.VISIBLE);
 			}
+			
+			listePoint.setVisibility(View.VISIBLE);
 			
 			boutonVersConnexion.setVisibility(View.GONE); //Cache le bouton de connexion
 			boutonVersInscription.setVisibility(View.GONE); //Cache le bouton d'inscription
@@ -210,14 +212,23 @@ public class Accueil extends Activity
 		startActivity(intent); //Lance l'intent
 	}
 	
+	
 	/**
 	 * Lance l'activité connexion
 	 * @param v
 	 */
 	public void Connexion(View v)
 	{
-		Intent intent = new Intent(this,Connexion.class); //Défini l'intent
-		startActivity(intent); //Lance l'intent
+		if(isOnline())
+		{
+			Intent intent = new Intent(this,Connexion.class); //Défini l'intent
+			startActivity(intent); //Lance l'intent
+		}
+		else
+		{
+			Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastNoConnexion), Toast.LENGTH_SHORT).show();
+		}
+		
 	}
 	
 	/**
@@ -226,8 +237,15 @@ public class Accueil extends Activity
 	 */
 	public void Inscription(View v)
 	{
-		Intent intent = new Intent(this,Inscription.class); //Défini l'intent
-		startActivity(intent); //Lance l'intent
+		if(isOnline())
+		{
+			Intent intent = new Intent(this,Inscription.class); //Défini l'intent
+			startActivity(intent); //Lance l'intent
+		}
+		else
+		{
+			Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastNoConnexion), Toast.LENGTH_SHORT).show();
+		}
 	}
 	
 	/**
@@ -243,7 +261,6 @@ public class Accueil extends Activity
 		}
 		else
 		{
-			
 			Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastNonConnecterApprouver), Toast.LENGTH_SHORT).show();
 			Connexion(v);
 		}
