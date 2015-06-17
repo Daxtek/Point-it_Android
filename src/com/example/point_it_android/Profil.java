@@ -69,8 +69,7 @@ public class Profil extends Activity {
 	private ProgressDialog progressDialog;
 
 	//Variables en rapport avec le JSON   
-	JSONParser jParser = new JSONParser();
-	private JSONArray  donnees_element = null ; // Tableau JSON des donnŽes   
+	JSONParser jParser = new JSONParser();   
 	
 	private String url_profil = "http://192.168.1.94/Point-it/index.php/api/getProfil";
 	

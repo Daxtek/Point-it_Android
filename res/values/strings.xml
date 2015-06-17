@@ -23,6 +23,8 @@
     <string name="boutonProfil">Profil </string>
     <string name="boutonClassement">Classement </string>
     <string name="boutonAjoutPoint"> + Point </string>
+    <string name="typeDePointAccueil"><u>Type de point : </u></string>
+    <string name="AttribueA"><u>Attribué A : </u></string>
 
     <!-- Strings de l'activité Connexion -->
     <string name="nomUtilisateur"> Nom d\'utilisateur : </string>

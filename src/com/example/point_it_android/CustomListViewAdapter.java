@@ -66,6 +66,12 @@ public class CustomListViewAdapter extends BaseAdapter
 		TextView txtText = (TextView) convertView.findViewById(R.id.TextViewDescriptionPoint);
 		txtText.setText(items.get(position).getText()); //Défini le texte
 		
+		TextView txtTypeDePoint = (TextView) convertView.findViewById(R.id.TextViewTypeDePoint);
+		txtTypeDePoint.setText(items.get(position).getTypeDePoint()); //Défini le texte
+		
+		TextView txtAttribueA = (TextView) convertView.findViewById(R.id.TextViewAttribueA);
+		txtAttribueA.setText(items.get(position).getAttribueA()); //Défini le texte
+		
 		
 		
 		
